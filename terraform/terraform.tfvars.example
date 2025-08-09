@@ -1,0 +1,22 @@
+# Terraform Configuration Example
+# Copy this file to terraform.tfvars and update with your values
+
+aws_region = "us-east-1"
+environment = "dev"
+project_name = "inventory-dashboard"
+
+# Database Configuration - USE A SECURE PASSWORD
+db_password = "your_secure_database_password_here"
+db_instance_class = "db.t3.micro"
+db_allocated_storage = 20
+db_max_allocated_storage = 100
+
+# Container Resource Configuration
+frontend_cpu = 256
+frontend_memory = 512
+backend_cpu = 512
+backend_memory = 1024
+
+# Scaling Configuration
+frontend_desired_count = 1
+backend_desired_count = 1

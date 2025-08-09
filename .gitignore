@@ -1,0 +1,298 @@
+# ==========================================
+# INVENTORY MANAGEMENT SYSTEM - .gitignore
+# ==========================================
+# This file ensures sensitive data is never committed to the public repository
+
+# ==========================================
+# SECURITY - NEVER COMMIT THESE FILES
+# ==========================================
+
+# Environment files with secrets
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+*.env
+
+# AWS credentials and config
+.aws/
+aws-credentials.json
+credentials.json
+config.json
+
+# Terraform state files (contain sensitive data)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+terraform.tfvars
+terraform.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+
+# SSH keys and certificates
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+id_rsa*
+id_dsa*
+id_ecdsa*
+id_ed25519*
+
+# Database dumps and backups
+*.sql
+*.dump
+*.backup
+database.db
+*.sqlite
+*.sqlite3
+
+# Docker secrets
+docker-compose.override.yml
+docker-compose.prod.yml
+docker-compose.secrets.yml
+
+# Kubernetes secrets
+*secret*.yaml
+*secret*.yml
+
+# ==========================================
+# DEPENDENCIES
+# ==========================================
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.npm
+.yarn/
+.pnp.*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ==========================================
+# BUILD OUTPUTS
+# ==========================================
+
+# React build
+frontend/build/
+frontend/dist/
+frontend/.next/
+
+# Node.js build
+backend/build/
+backend/dist/
+backend/lib/
+
+# General build directories
+build/
+dist/
+out/
+target/
+
+# ==========================================
+# DEVELOPMENT TOOLS
+# ==========================================
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Visual Studio Code
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# ==========================================
+# LOGS AND TEMPORARY FILES
+# ==========================================
+
+# Log files
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+.coverage
+htmlcov/
+.pytest_cache/
+
+# nyc test coverage
+.nyc_output
+
+# ==========================================
+# PACKAGE MANAGERS
+# ==========================================
+
+# npm
+package-lock.json  # Comment this out if you want to commit lock files
+.npmrc
+
+# Yarn
+yarn.lock  # Comment this out if you want to commit lock files
+.yarnrc
+.yarn/
+.pnp.*
+
+# pnpm
+pnpm-lock.yaml
+
+# ==========================================
+# DOCKER
+# ==========================================
+
+# Docker files that might contain secrets
+docker-compose.override.yml
+docker-compose.prod.yml
+docker-compose.local.yml
+
+# Docker build cache
+.dockerignore
+
+# ==========================================
+# CLOUD PROVIDER SPECIFIC
+# ==========================================
+
+# AWS
+.aws/
+*.pem
+aws-exports.js
+
+# Google Cloud
+.gcloud/
+gcloud-service-key.json
+service-account-key.json
+
+# Azure
+.azure/
+
+# ==========================================
+# TESTING
+# ==========================================
+
+# Test results
+test-results/
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+.cache/
+
+# Jest
+jest_html_reporters.html
+
+# ==========================================
+# TEMPORARY FILES
+# ==========================================
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary folders
+tmp/
+temp/
+.tmp/
+.temp/
+
+# ==========================================
+# SPECIFIC TO THIS PROJECT
+# ==========================================
+
+# Backup files created during development
+*.backup
+*.bak
+*.orig
+
+# Project-specific files
+outputs.json
+terraform-outputs.json
+deployment-config.json
+
+# ECR URLs and deployment scripts with hardcoded values
+scripts/deploy-prod.sh
+scripts/secrets.sh
+
+# Database connection test files
+test-db-connection.js
+testConnection.js
+
+# SSL certificates and patches
+ssl_patch.js
+pg_hba.conf
+
+# Large files that shouldn't be in repo
+*.zip
+*.tar.gz
+*.rar
+awscliv2.zip
+get-docker.sh
+
+# Old backup directories
+*-backup/
+frontend-backup/
+
+# ==========================================
+# DOCUMENTATION DRAFTS
+# ==========================================
+
+# Drafts and notes
+NOTES.md
+TODO.md
+DRAFT-*.md
+*-draft.*
+
+# ==========================================
+# EXAMPLES TO CREATE FOR PUBLIC USE
+# ==========================================
+# These files should be created as .example files:
+# - .env.example
+# - terraform.tfvars.example
+# - docker-compose.override.yml.example
+# - aws-config.example.json
