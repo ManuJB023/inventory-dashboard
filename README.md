@@ -1,514 +1,563 @@
-# Inventory Management Dashboard ✅ FULLY OPERATIONAL
+# Inventory Management Dashboard
 
-A complete, production-ready inventory management system built with React, Node.js, PostgreSQL, and deployed using Terraform on AWS ECS Fargate.
+![AWS](https://img.shields.io/badge/AWS-ECS%20Fargate-orange)
+![React](https://img.shields.io/badge/React-19-blue)
+![Node.js](https://img.shields.io/badge/Node.js-18-green)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue)
+![Terraform](https://img.shields.io/badge/Terraform-1.6+-purple)
+![Docker](https://img.shields.io/badge/Docker-Containerized-blue)
+![License](https://img.shields.io/badge/License-MIT-yellow)
 
-**🚀 Live Application Status: DEPLOYED & WORKING**
-- Frontend: http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com
-- Backend API: http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com/api
-- Health Check: http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com/health
+> A complete, production-ready inventory management system showcasing modern cloud-native development practices.
 
-## 🏗️ Architecture
+## 🚀 Demo & Screenshots
+
+<table>
+<tr>
+<td width="50%">
+<h3>🏠 Landing Page</h3>
+<img src="https://via.placeholder.com/400x250/3B82F6/FFFFFF?text=Professional+Landing+Page" alt="Landing Page" width="100%">
+<p><em>Clean, professional welcome page with call-to-action</em></p>
+</td>
+<td width="50%">
+<h3>📊 Real-time Dashboard</h3>
+<img src="https://via.placeholder.com/400x250/10B981/FFFFFF?text=Live+Dashboard+Analytics" alt="Dashboard" width="100%">
+<p><em>Interactive dashboard with live statistics and metrics</em></p>
+</td>
+</tr>
+<tr>
+<td width="50%">
+<h3>📦 Product Management</h3>
+<img src="https://via.placeholder.com/400x250/8B5CF6/FFFFFF?text=Product+CRUD+Interface" alt="Product Management" width="100%">
+<p><em>Complete product management with modal forms</em></p>
+</td>
+<td width="50%">
+<h3>🏗️ AWS Architecture</h3>
+<img src="https://via.placeholder.com/400x250/F59E0B/FFFFFF?text=Cloud+Infrastructure" alt="Architecture" width="100%">
+<p><em>Production-ready AWS ECS deployment</em></p>
+</td>
+</tr>
+</table>
+
+## 🏠 Local Development
+
+Get started in minutes with Docker Compose:
+
+```bash
+# Clone repository
+git clone https://github.com/ManuJB023/inventory-dashboard.git
+cd inventory-dashboard
+
+# Copy example configurations
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+# Start with Docker Compose
+docker-compose up -d
+```
+
+**🎯 Access your local application:**
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001/api
+- **Database**: localhost:5432 (PostgreSQL)
+- **Health Check**: http://localhost:3001/health
+
+## 🏗️ Architecture Overview
 
 ```
-Internet Gateway
-      │
-┌─────▼─────┐
-│    ALB    │ ← inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com
-│ Port: 80  │
-└─────┬─────┘
-      │
-┌─────▼─────────────────────────────────────┐
-│            VPC (10.0.0.0/16)              │
-│  ┌─────────────┐    ┌─────────────────┐   │
-│  │   Public    │    │    Private      │   │
-│  │   Subnets   │    │    Subnets      │   │
-│  └─────────────┘    └─────┬───────────┘   │
-│                           │               │
-│                    ┌──────▼──────┐        │
-│                    │  ECS Tasks  │        │
-│                    │             │        │
-│     React App ◄────┤ Frontend:   │        │
-│     (Port 3000)    │ - Navigation│        │
-│                    │ - Dashboard │        │
-│                    │ - Products  │        │
-│                    │ - Add Forms │        │
-│                    │             │        │
-│     Node.js API◄───┤ Backend:    │        │
-│     (Port 3001)    │ - REST API  │        │
-│                    │ - Sequelize │        │
-│                    │ - Validation│        │
-│                    └─────────────┘        │
-│                           │               │
-│                    ┌──────▼──────┐        │
-│                    │ RDS         │        │
-│                    │ PostgreSQL  │        │
-│                    │ Port: 5432  │        │
-│                    └─────────────┘        │
-└────────────────────────────────────────────┘
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   React App     │    │   Node.js API   │    │   PostgreSQL    │
+│   (Frontend)    │◄───┤   (Backend)     │◄───┤   (Database)    │
+│   Port: 3000    │    │   Port: 3001    │    │   Port: 5432    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+                    ┌─────────────────┐
+                    │ Docker Compose  │
+                    │ (Local Dev)     │
+                    │       OR        │
+                    │   AWS ECS       │
+                    │ (Production)    │
+                    └─────────────────┘
 ```
 
-## 🎉 WORKING FEATURES (Fully Tested & Operational)
+## 🎉 Features
 
-### ✅ Frontend (React + TypeScript)
-- **🏠 Landing Page** - Professional welcome page with "Get Started" button
-- **📊 Dashboard** - Real-time statistics (products, value, low stock, categories)
+### ✨ Frontend (React + TypeScript)
+- **🏠 Landing Page** - Professional welcome page with navigation
+- **📊 Real-time Dashboard** - Live statistics and analytics
 - **📦 Product Management** - Complete CRUD operations with modal forms
-- **🔍 Product Search & Filtering** - Pagination and category filtering
-- **📱 Responsive Design** - Works on desktop, tablet, and mobile
-- **🎯 Navigation** - React Router with smooth page transitions
-- **🎨 Professional UI** - Tailwind CSS with hover effects and animations
+- **🔍 Search & Filtering** - Advanced product filtering and pagination
+- **📱 Responsive Design** - Works perfectly on all devices
+- **🎯 React Router** - Smooth single-page application navigation
+- **🎨 Tailwind CSS** - Modern, professional UI with animations
 
-### ✅ Backend (Node.js + Express)
-- **🔒 RESTful API** - All endpoints working and tested
-- **🛡️ Security** - Helmet, CORS, input validation, rate limiting
-- **📝 Comprehensive Logging** - Request/response logging with Morgan
+### 🛡️ Backend (Node.js + Express)
+- **🔒 RESTful API** - Comprehensive endpoints with validation
+- **🛡️ Security Features** - Helmet, CORS, rate limiting, input validation
+- **📝 Request Logging** - Complete audit trail with Morgan
 - **🔍 Advanced Queries** - Pagination, search, filtering, sorting
-- **📊 Dashboard Analytics** - Real-time statistics calculation
-- **🏥 Health Monitoring** - Health check endpoint with database status
-- **💾 Database Integration** - Sequelize ORM with PostgreSQL
-- **🔄 Stock Management** - Track inventory movements (IN/OUT/ADJUSTMENT)
+- **📊 Analytics Engine** - Real-time dashboard statistics
+- **🏥 Health Monitoring** - Health check endpoints
+- **💾 Database ORM** - Sequelize with PostgreSQL
+- **🔄 Stock Tracking** - Complete inventory movement history
 
-### ✅ Infrastructure (Terraform + AWS)
-- **🌐 VPC** - Custom VPC with public/private subnets across 2 AZs
-- **🔄 Application Load Balancer** - Traffic distribution with health checks
-- **🐳 ECS Fargate** - Serverless container orchestration
-- **🗄️ RDS PostgreSQL** - Managed database with automated backups
+### 🚀 Infrastructure (Production-Ready)
+- **🐳 Docker Containers** - Multi-stage builds for optimization
+- **☁️ AWS ECS Fargate** - Serverless container orchestration
+- **🗄️ RDS PostgreSQL** - Managed database with backups
+- **🔄 Load Balancer** - Application Load Balancer with health checks
+- **🌐 VPC Network** - Secure networking with public/private subnets
 - **📊 CloudWatch** - Centralized logging and monitoring
-- **🔐 Security** - IAM roles, security groups, SSL encryption
-- **🏗️ ECR** - Private container registry
-- **⚡ Auto Scaling** - CPU-based scaling for both frontend and backend
+- **🔐 Security** - IAM roles, security groups, encrypted secrets
+- **⚡ Auto Scaling** - CPU-based scaling policies
 
-## 🚀 DEPLOYMENT STATUS
-
-**Current Environment: Development**
-- **Region**: us-east-1
-- **Cluster**: inventory-dashboard-dev-cluster
-- **Database**: inventory-dashboard-dev-postgres
-- **Frontend Service**: ✅ RUNNING (1/1 tasks healthy)
-- **Backend Service**: ✅ RUNNING (1/1 tasks healthy)
-- **Load Balancer**: ✅ HEALTHY
-- **Database**: ✅ CONNECTED
-
-**Resources Deployed:**
-```
-✅ VPC with 2 public + 2 private subnets
-✅ Application Load Balancer with health checks
-✅ ECS Fargate cluster with 2 services
-✅ RDS PostgreSQL database (db.t3.micro)
-✅ ECR repositories for frontend/backend images
-✅ CloudWatch log groups
-✅ IAM roles and security groups
-✅ SSM parameters for secrets
-```
-
-## 📋 Getting Started
+## 📋 Quick Start Guide
 
 ### Prerequisites
 - **Node.js** 18+ and npm
 - **Docker** and Docker Compose
-- **AWS CLI** configured
-- **Terraform** 1.6+
+- **Git** for version control
 
-### 🏃‍♂️ Quick Local Development
-
+### 1. Clone and Setup
 ```bash
-# Clone repository
-git clone <repository-url>
-cd inventory-system
+git clone https://github.com/ManuJB023/inventory-dashboard.git
+cd inventory-dashboard
 
-# Start local development
+# Install dependencies (optional - Docker handles this)
+cd backend && npm install
+cd ../frontend && npm install
+cd ..
+```
+
+### 2. Local Development
+```bash
+# Copy environment configurations
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
+
+# Edit .env files with your preferences (optional for local dev)
+# Default values work out of the box
+
+# Start all services
 docker-compose up -d
 
-# Access locally
-# Frontend: http://localhost:3000
-# Backend: http://localhost:3001
-# Database: localhost:5432
+# View logs (optional)
+docker-compose logs -f
 ```
 
-### 🚀 Deploy to AWS (Production-Ready)
+### 3. Access Application
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
+- **API Documentation**: http://localhost:3001/api/products
+- **Health Check**: http://localhost:3001/health
 
-```bash
-# 1. Configure AWS credentials
-aws configure
-
-# 2. Set environment variables
-export AWS_REGION=us-east-1
-export ENVIRONMENT=dev
-
-# 3. Deploy infrastructure
-cd terraform
-terraform init
-terraform plan
-terraform apply
-
-# 4. Build and push Docker images
-cd ../backend
-aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your-account>.dkr.ecr.us-east-1.amazonaws.com
-docker build -t inventory-dashboard-dev-backend .
-docker tag inventory-dashboard-dev-backend:latest <your-account>.dkr.ecr.us-east-1.amazonaws.com/inventory-dashboard-dev-backend:latest
-docker push <your-account>.dkr.ecr.us-east-1.amazonaws.com/inventory-dashboard-dev-backend:latest
-
-cd ../frontend
-docker build -t inventory-dashboard-dev-frontend .
-docker tag inventory-dashboard-dev-frontend:latest <your-account>.dkr.ecr.us-east-1.amazonaws.com/inventory-dashboard-dev-frontend:latest
-docker push <your-account>.dkr.ecr.us-east-1.amazonaws.com/inventory-dashboard-dev-frontend:latest
-
-# 5. Update ECS services
-aws ecs update-service --cluster inventory-dashboard-dev-cluster --service inventory-dashboard-dev-backend --force-new-deployment
-aws ecs update-service --cluster inventory-dashboard-dev-cluster --service inventory-dashboard-dev-frontend --force-new-deployment
-```
+### 4. Test the Features
+1. **Visit Frontend** → Professional landing page
+2. **Click "Get Started"** → Navigate to dashboard
+3. **View Dashboard** → See real-time statistics (initially empty)
+4. **Go to Products** → Product management interface
+5. **Add Products** → Use the modal form to add inventory items
+6. **Watch Dashboard Update** → See live statistics change
 
 ## 📁 Project Structure
 
 ```
-inventory-system/
-├── backend/                 # ✅ Node.js API (WORKING)
-│   ├── app.js              # Main application file
-│   ├── Dockerfile          # Container configuration
-│   ├── package.json        # Dependencies and scripts
-│   └── .env                # Environment variables
-├── frontend/               # ✅ React App (WORKING)
-│   ├── src/
-│   │   ├── App.tsx         # Main React component with routing
-│   │   ├── index.tsx       # React entry point
-│   │   └── index.css       # Tailwind CSS styles
-│   ├── public/
-│   ├── Dockerfile          # Multi-stage build with Nginx
-│   ├── nginx.conf          # Nginx configuration
-│   └── package.json        # React dependencies
-├── terraform/              # ✅ Infrastructure (DEPLOYED)
-│   ├── main.tf             # VPC, subnets, ALB, RDS
-│   ├── ecs.tf              # ECS cluster, services, tasks
-│   ├── variables.tf        # Input variables
-│   ├── outputs.tf          # Output values
-│   └── terraform.tfvars    # Environment configuration
-├── docker-compose.yml      # Local development
-└── README.md              # This file
+inventory-dashboard/
+├── 📁 backend/                 # Node.js API Server
+│   ├── 📄 app.js              # Main application file
+│   ├── 📄 package.json        # Dependencies and scripts
+│   ├── 📄 Dockerfile          # Container configuration
+│   └── 📄 .env.example        # Environment template
+├── 📁 frontend/               # React Application
+│   ├── 📁 src/
+│   │   ├── 📄 App.tsx         # Main React component
+│   │   ├── 📄 index.tsx       # Application entry point
+│   │   └── 📄 index.css       # Tailwind CSS styles
+│   ├── 📁 public/             # Static assets
+│   ├── 📄 package.json        # React dependencies
+│   ├── 📄 Dockerfile          # Multi-stage build
+│   └── 📄 nginx.conf          # Production web server
+├── 📁 terraform/              # Infrastructure as Code
+│   ├── 📄 main.tf             # VPC, networking, RDS
+│   ├── 📄 ecs.tf              # ECS cluster and services
+│   ├── 📄 variables.tf        # Input variables
+│   ├── 📄 outputs.tf          # Output values
+│   └── 📄 terraform.tfvars.example # Configuration template
+├── 📄 docker-compose.yml      # Local development
+├── 📄 .gitignore             # Git ignore rules
+└── 📄 README.md              # This documentation
 ```
+
+## 🚀 Deploy to AWS (Optional)
+
+Deploy to production-ready AWS infrastructure:
+
+### Prerequisites for AWS Deployment
+- **AWS CLI** configured with appropriate permissions
+- **Terraform** 1.6+ installed
+- **Docker** for building images
+
+### 1. Configure AWS
+```bash
+# Configure AWS credentials
+aws configure
+
+# Verify access
+aws sts get-caller-identity
+```
+
+### 2. Setup Terraform
+```bash
+# Copy and edit Terraform configuration
+cp terraform/terraform.tfvars.example terraform/terraform.tfvars
+
+# Edit terraform.tfvars with your values:
+# - aws_region (e.g., us-east-1)
+# - environment (dev/staging/prod)
+# - db_password (secure password)
+# - resource sizing
+```
+
+### 3. Deploy Infrastructure
+```bash
+cd terraform
+
+# Initialize Terraform
+terraform init
+
+# Plan deployment
+terraform plan
+
+# Deploy (takes 10-15 minutes)
+terraform apply
+```
+
+### 4. Build and Deploy Applications
+```bash
+# Get your AWS account ID
+ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+REGION=us-east-1
+
+# Login to ECR
+aws ecr get-login-password --region $REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com
+
+# Build and push backend
+cd backend
+docker build -t inventory-dashboard-dev-backend .
+docker tag inventory-dashboard-dev-backend:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/inventory-dashboard-dev-backend:latest
+docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/inventory-dashboard-dev-backend:latest
+
+# Build and push frontend
+cd ../frontend
+docker build -t inventory-dashboard-dev-frontend .
+docker tag inventory-dashboard-dev-frontend:latest $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/inventory-dashboard-dev-frontend:latest
+docker push $ACCOUNT_ID.dkr.ecr.$REGION.amazonaws.com/inventory-dashboard-dev-frontend:latest
+
+# Update ECS services
+aws ecs update-service --cluster inventory-dashboard-dev-cluster --service inventory-dashboard-dev-backend --force-new-deployment
+aws ecs update-service --cluster inventory-dashboard-dev-cluster --service inventory-dashboard-dev-frontend --force-new-deployment
+```
+
+### 5. Access Your Deployment
+```bash
+# Get the load balancer URL
+terraform output application_url
+
+# Test the deployment
+curl $(terraform output -raw application_url)/health
+```
+
+## 📊 API Reference
+
+### Products API
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/products` | List all products with pagination |
+| `GET` | `/api/products/:id` | Get single product details |
+| `POST` | `/api/products` | Create new product |
+| `PUT` | `/api/products/:id` | Update existing product |
+| `DELETE` | `/api/products/:id` | Delete product |
+
+### Dashboard API
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/dashboard/stats` | Get dashboard statistics |
+| `GET` | `/api/categories` | Get product categories |
+
+### Stock Management API
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/api/stock-movements` | Record stock movement |
+| `GET` | `/api/stock-movements` | Get movement history |
+
+### System API
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Health check with database status |
 
 ## 🔧 Configuration
 
-### Backend Environment Variables (Automatically managed via SSM)
+### Backend Environment Variables
 ```bash
+# Copy from backend/.env.example
 NODE_ENV=development
 PORT=3001
-DB_HOST=inventory-dashboard-dev-postgres.xxx.rds.amazonaws.com
+DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=inventory_db
-DB_USER=postgres           # Stored in SSM Parameter Store
-DB_PASSWORD=***            # Stored in SSM Parameter Store (SecureString)
-DB_SSL=true
-JWT_SECRET=***             # Auto-generated and stored securely
-CORS_ORIGIN=http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com
+DB_USER=postgres
+DB_PASSWORD=your_secure_password
+JWT_SECRET=your_jwt_secret_minimum_32_characters
+CORS_ORIGIN=http://localhost:3000
 ```
 
 ### Frontend Environment Variables
 ```bash
-REACT_APP_API_URL=/api     # Relative URL for same-origin requests
-NODE_ENV=production
+# Copy from frontend/.env.example
+REACT_APP_API_URL=http://localhost:3001/api
+REACT_APP_ENV=development
+REACT_APP_ENABLE_ANALYTICS=false
 ```
 
-## 📊 API Endpoints (All Working & Tested)
+## 🧪 Development & Testing
 
-### Products
-- `GET /api/products` - ✅ List products with pagination, search, filtering
-- `GET /api/products/:id` - ✅ Get single product with stock movements
-- `POST /api/products` - ✅ Create new product (working form)
-- `PUT /api/products/:id` - ✅ Update product
-- `DELETE /api/products/:id` - ✅ Delete product
+### Local Development Commands
+```bash
+# Start all services
+docker-compose up -d
 
-### Stock Management
-- `POST /api/stock-movements` - ✅ Record stock movement (IN/OUT/ADJUSTMENT)
-- `GET /api/stock-movements` - ✅ Get movement history with pagination
+# View logs
+docker-compose logs -f backend
+docker-compose logs -f frontend
 
-### Dashboard & Analytics
-- `GET /api/dashboard/stats` - ✅ Real-time statistics (live on dashboard)
-- `GET /api/categories` - ✅ Get product categories with counts
+# Stop services
+docker-compose down
 
-### System
-- `GET /health` - ✅ Health check (database connectivity test)
+# Rebuild after code changes
+docker-compose up --build
 
-## 🎯 User Journey (Fully Tested)
+# Run tests (when implemented)
+cd backend && npm test
+cd frontend && npm test
+```
 
-1. **📱 Visit Application** 
-   - Land on professional welcome page
-   - Click "Get Started" → Navigate to Dashboard
+### Database Management
+```bash
+# Access PostgreSQL directly
+docker-compose exec postgres psql -U postgres -d inventory_db
 
-2. **📊 View Dashboard**
-   - See real-time statistics (products, value, low stock)
-   - View recent stock movements
-   - Navigate between sections
+# View database logs
+docker-compose logs postgres
 
-3. **📦 Manage Products**
-   - Click "Products" in navigation
-   - View products table (empty initially)
-   - Click "Add Your First Product" or "Add Product"
-   - Fill out comprehensive form (name, SKU, price, category, etc.)
-   - Submit form → Product appears immediately
-   - Dashboard updates with new statistics
+# Reset database (removes all data)
+docker-compose down -v
+docker-compose up -d
+```
 
-4. **🔄 Track Inventory**
-   - Products show current stock levels
-   - Low stock items highlighted in red
-   - Stock movements tracked automatically
-
-## 🛡️ Security Features (Implemented & Active)
+## 🛡️ Security Features
 
 ### Application Security
 - **Input Validation** - Express-validator on all endpoints
-- **SQL Injection Prevention** - Sequelize ORM with parameterized queries
+- **SQL Injection Prevention** - Sequelize ORM parameterized queries
 - **XSS Protection** - Helmet.js security headers
-- **CORS Configuration** - Proper origin restrictions
-- **Rate Limiting** - 100 requests per 15 minutes per IP
+- **CORS Configuration** - Controlled cross-origin requests
+- **Rate Limiting** - Protection against abuse
 - **Request Logging** - Complete audit trail
 
-### Infrastructure Security
-- **VPC Isolation** - Private subnets for compute resources
-- **Security Groups** - Least privilege network access
-- **IAM Roles** - Minimal required permissions
-- **SSL/TLS** - Encrypted data in transit
-- **Secrets Management** - AWS Systems Manager Parameter Store
-- **Database Encryption** - RDS encryption at rest
+### Infrastructure Security (AWS)
+- **VPC Isolation** - Private subnets for applications
+- **Security Groups** - Network-level access control
+- **IAM Roles** - Least privilege access
+- **Secrets Management** - AWS Systems Manager
+- **Encryption** - Data encrypted in transit and at rest
 
-## 📈 Monitoring & Observability (Active)
+## 💰 AWS Cost Estimation
 
-### CloudWatch Logging
-```bash
-# View real-time logs
-aws logs tail /ecs/inventory-dashboard-dev-backend --follow
-aws logs tail /ecs/inventory-dashboard-dev-frontend --follow
-```
+### Development Environment
+- **ECS Fargate**: ~$30-50/month (2 tasks)
+- **RDS t3.micro**: ~$15-20/month
+- **Application Load Balancer**: ~$20/month
+- **NAT Gateway**: ~$45/month (HA setup)
+- **CloudWatch & Storage**: ~$5-10/month
 
-### Health Monitoring
-- **Load Balancer Health Checks** - Every 30 seconds
-- **ECS Task Health** - Container-level monitoring
-- **Database Connectivity** - Health endpoint tests DB connection
-- **Auto-scaling Triggers** - CPU utilization monitoring
+**Total: ~$115-145/month**
 
-### Metrics Dashboard
-- **Service Status** - Running/Desired count
-- **Response Times** - API endpoint performance
-- **Error Rates** - Failed request tracking
-- **Resource Utilization** - CPU/Memory usage
+### Cost Optimization
+- Use single NAT Gateway for development (-$22/month)
+- Use RDS t3.micro free tier (first 12 months)
+- Set CloudWatch log retention policies
+- Use Spot instances for non-critical workloads
 
-## 🧪 Testing Commands
+## 🚀 Performance & Scalability
 
-```bash
-# Test API endpoints
-curl http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com/health
-curl http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com/api/products
-curl http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com/api/dashboard/stats
+### Local Development
+- **Frontend**: Instant hot reload
+- **Backend**: Nodemon auto-restart
+- **Database**: Local PostgreSQL instance
 
-# Check service status
-aws ecs describe-services --cluster inventory-dashboard-dev-cluster --services inventory-dashboard-dev-backend inventory-dashboard-dev-frontend
+### Production (AWS)
+- **Auto-scaling**: CPU-based scaling policies
+- **Load Balancing**: Multi-AZ distribution
+- **Database**: RDS with automated backups
+- **Monitoring**: CloudWatch metrics and alarms
 
-# View task details
-aws ecs list-tasks --cluster inventory-dashboard-dev-cluster --service-name inventory-dashboard-dev-backend
-```
+## 🔮 Roadmap & Future Enhancements
 
-## 🐛 Troubleshooting Guide
+### Phase 1 - Core Features ✅
+- [x] Product management CRUD
+- [x] Real-time dashboard
+- [x] Responsive design
+- [x] Docker containerization
+- [x] AWS deployment
 
-### Common Issues & Solutions
-
-#### 1. Container Won't Start
-```bash
-# Check service events
-aws ecs describe-services --cluster inventory-dashboard-dev-cluster --services inventory-dashboard-dev-backend --query 'services[0].events[0:5]'
-
-# Check stopped tasks
-aws ecs list-tasks --cluster inventory-dashboard-dev-cluster --service-name inventory-dashboard-dev-backend --desired-status STOPPED
-
-# Get task failure details
-aws ecs describe-tasks --cluster inventory-dashboard-dev-cluster --tasks <task-arn>
-```
-
-#### 2. Database Connection Issues
-```bash
-# Test health endpoint
-curl http://inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com/health
-
-# Check database status
-aws rds describe-db-instances --db-instance-identifier inventory-dashboard-dev-postgres
-```
-
-#### 3. Load Balancer Issues
-```bash
-# Check target health
-aws elbv2 describe-target-health --target-group-arn <target-group-arn>
-
-# Check ALB logs
-aws logs get-log-events --log-group-name /aws/applicationloadbalancer/inventory-dashboard-dev-alb
-```
-
-## 🔄 Deployment Workflow
-
-### Successful Deployment Steps
-1. **Infrastructure Deployment** ✅
-   ```bash
-   terraform apply
-   ```
-
-2. **Backend Image Build & Push** ✅
-   ```bash
-   docker build -t backend .
-   docker push <ecr-url>/backend:latest
-   ```
-
-3. **Frontend Image Build & Push** ✅
-   ```bash
-   docker build -t frontend .
-   docker push <ecr-url>/frontend:latest
-   ```
-
-4. **Service Updates** ✅
-   ```bash
-   aws ecs update-service --force-new-deployment
-   ```
-
-5. **Health Verification** ✅
-   ```bash
-   # All services healthy
-   # Database connected
-   # API endpoints responding
-   # Frontend loading correctly
-   ```
-
-## 💰 Cost Breakdown (Current Deployment)
-
-### Monthly AWS Costs (Estimated)
-- **ECS Fargate**: ~$30-50 (2 tasks running 24/7)
-- **RDS t3.micro**: ~$15-20 (development database)
-- **Application Load Balancer**: ~$20 (includes data processing)
-- **NAT Gateways**: ~$45 (2 NAT gateways for high availability)
-- **CloudWatch Logs**: ~$5 (log storage and queries)
-- **ECR Storage**: ~$1 (Docker images)
-
-**Total Estimated: $116-141/month**
-
-### Cost Optimization Tips
-- Use Spot instances for development
-- Set up CloudWatch log retention policies
-- Enable RDS automated backups only for production
-- Consider single NAT gateway for development
-
-## 🚀 Performance Metrics (Actual Results)
-
-### Response Times
-- **Frontend Load Time**: <2 seconds
-- **API Response Time**: <200ms average
-- **Database Queries**: <50ms average
-- **Health Check**: <100ms
-
-### Scalability
-- **Auto-scaling**: Enabled (CPU >70% triggers scale-up)
-- **Database**: Single instance (can add read replicas)
-- **Load Balancer**: Handles traffic distribution
-- **Container Resources**: 512 CPU, 1024 MB RAM per task
-
-## 🔮 Next Steps & Enhancements
-
-### Phase 1 - Additional Features
-- **User Authentication** - Login/logout functionality
-- **Stock Movements UI** - Visual stock tracking
-- **Product Images** - Upload and display product photos
-- **Export/Import** - CSV export/import functionality
-- **Advanced Filtering** - Date ranges, suppliers, etc.
-
-### Phase 2 - Advanced Features
-- **Barcode Scanning** - Mobile barcode integration
-- **Notifications** - Low stock alerts via email/SMS
-- **Reporting** - Advanced analytics and reports
-- **Multi-location** - Support for multiple warehouses
-- **API Keys** - Third-party integration support
+### Phase 2 - Enhanced Features
+- [ ] User authentication and authorization
+- [ ] Advanced inventory reports
+- [ ] Product image uploads
+- [ ] Barcode scanning support
+- [ ] Email notifications for low stock
 
 ### Phase 3 - Enterprise Features
-- **Multi-tenant** - Support multiple organizations
-- **Role-based Access** - Admin/Manager/User roles
-- **Audit Logs** - Complete change tracking
-- **Integration APIs** - ERP/Accounting system integration
-- **Mobile App** - React Native mobile application
+- [ ] Multi-tenant support
+- [ ] Role-based access control
+- [ ] API rate limiting and keys
+- [ ] Advanced analytics with charts
+- [ ] Integration with external systems
+
+### Phase 4 - Mobile & Advanced
+- [ ] React Native mobile app
+- [ ] Real-time notifications
+- [ ] Machine learning for demand forecasting
+- [ ] Multi-warehouse support
+- [ ] Advanced reporting dashboard
 
 ## 🤝 Contributing
 
-### Development Setup
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+### Quick Contribution Steps
+1. **Fork the repository**
+2. **Create feature branch** (`git checkout -b feature/amazing-feature`)
+3. **Make changes and test locally**
+4. **Commit changes** (`git commit -m 'Add amazing feature'`)
+5. **Push to branch** (`git push origin feature/amazing-feature`)
+6. **Open Pull Request**
+
+### Development Setup for Contributors
 ```bash
-# Clone and install
-git clone <repo>
-cd inventory-system
-cd backend && npm install
-cd ../frontend && npm install
-
-# Start local development
+git clone https://github.com/YOUR-USERNAME/inventory-dashboard.git
+cd inventory-dashboard
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env
 docker-compose up -d
-
-# Make changes and test
-# Frontend: http://localhost:3000
-# Backend: http://localhost:3001
 ```
 
-### Pull Request Process
-1. Create feature branch
-2. Test locally with docker-compose
-3. Update documentation if needed
-4. Submit PR with description of changes
-5. Automated tests will run
-6. Deploy to staging for review
+## 🐛 Troubleshooting
 
-## 📞 Support & Maintenance
+### Common Issues
 
-### Monitoring Checklist
-- [ ] Daily health check verification
-- [ ] Weekly cost review
-- [ ] Monthly security updates
-- [ ] Quarterly performance optimization
+#### "Cannot connect to database"
+```bash
+# Check if PostgreSQL is running
+docker-compose ps postgres
 
-### Emergency Contacts
-- **System Issues**: Check CloudWatch logs first
-- **Database Issues**: RDS console for status
-- **Infrastructure Issues**: Terraform state review
-- **Application Issues**: ECS service events
+# View database logs
+docker-compose logs postgres
 
-### Backup Strategy
-- **Database**: Automated daily RDS snapshots (7-day retention)
-- **Code**: Git repository with branch protection
-- **Infrastructure**: Terraform state in S3 with versioning
-- **Configuration**: SSM parameters automatically backed up
+# Restart database
+docker-compose restart postgres
+```
 
-## 📚 Documentation Links
+#### "Frontend not loading"
+```bash
+# Check if frontend is running
+docker-compose ps frontend
 
-- **AWS ECS**: https://docs.aws.amazon.com/ecs/
-- **Terraform AWS**: https://registry.terraform.io/providers/hashicorp/aws/
-- **React**: https://react.dev/
-- **Node.js**: https://nodejs.org/docs/
-- **PostgreSQL**: https://www.postgresql.org/docs/
+# Rebuild frontend
+docker-compose up --build frontend
+
+# Check frontend logs
+docker-compose logs frontend
+```
+
+#### "API endpoints not working"
+```bash
+# Check backend status
+curl http://localhost:3001/health
+
+# View backend logs
+docker-compose logs backend
+
+# Restart backend
+docker-compose restart backend
+```
+
+### AWS Deployment Issues
+```bash
+# Check ECS service status
+aws ecs describe-services --cluster inventory-dashboard-dev-cluster --services inventory-dashboard-dev-backend
+
+# View CloudWatch logs
+aws logs tail /ecs/inventory-dashboard-dev-backend --follow
+
+# Check RDS status
+aws rds describe-db-instances --db-instance-identifier inventory-dashboard-dev-postgres
+```
+
+## 📚 Learning Resources
+
+### Technologies Used
+- **[React Documentation](https://react.dev/)** - Frontend framework
+- **[Node.js Documentation](https://nodejs.org/docs/)** - Backend runtime
+- **[Express.js Guide](https://expressjs.com/)** - Web framework
+- **[PostgreSQL Documentation](https://www.postgresql.org/docs/)** - Database
+- **[Docker Documentation](https://docs.docker.com/)** - Containerization
+- **[AWS ECS Documentation](https://docs.aws.amazon.com/ecs/)** - Container orchestration
+- **[Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/)** - Infrastructure
+
+### Related Projects
+- **[React Inventory Management](https://github.com/topics/inventory-management)** - Similar projects
+- **[AWS ECS Examples](https://github.com/topics/aws-ecs)** - ECS deployment patterns
+- **[Full Stack JavaScript](https://github.com/topics/full-stack)** - Full-stack applications
 
 ## 📄 License
 
-MIT License - See LICENSE file for details
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🏆 Achievements
+## 🏆 Acknowledgments
 
-**Successfully Deployed Production-Ready System:**
-- ✅ Zero-downtime deployments
-- ✅ Auto-scaling infrastructure
-- ✅ Security best practices implemented
-- ✅ Comprehensive monitoring
-- ✅ Professional user interface
-- ✅ Complete CRUD operations
-- ✅ Real-time dashboard analytics
-- ✅ Responsive design
-- ✅ API integration working
-- ✅ Database persistence
-- ✅ Health monitoring
-- ✅ Error handling
-- ✅ Input validation
-- ✅ Secure secrets management
+**Built with modern technologies:**
+- **Frontend**: React 19, TypeScript 5, Tailwind CSS
+- **Backend**: Node.js 18, Express, Sequelize ORM
+- **Database**: PostgreSQL 16
+- **Infrastructure**: AWS ECS Fargate, Terraform
+- **DevOps**: Docker, CloudWatch
 
-**Built with ❤️ using modern cloud-native technologies**
+**Inspired by modern cloud-native applications and best practices in:**
+- Full-stack JavaScript development
+- Containerized application deployment
+- Infrastructure as Code
+- Security-first development
+- Professional documentation
+
+## 📞 Support
+
+- **🐛 Issues**: [GitHub Issues](https://github.com/ManuJB023/inventory-dashboard/issues)
+- **💬 Discussions**: [GitHub Discussions](https://github.com/ManuJB023/inventory-dashboard/discussions)
+- **📖 Documentation**: This README and inline code comments
+- **🔍 Examples**: Check the `/examples` directory for usage patterns
 
 ---
 
-**Status**: 🟢 **FULLY OPERATIONAL**  
-**Last Updated**: August 9, 2025  
-**Deployment**: inventory-dashboard-dev-alb-1716456667.us-east-1.elb.amazonaws.com  
-**Version**: 1.0.0 - Production Ready
+**⭐ Star this repository if you find it helpful!**
+
+**🔗 Connect**: [GitHub Profile](https://github.com/ManuJB023) | [LinkedIn](https://linkedin.com/in/your-profile)
+
+**📊 Project Stats**: ![GitHub stars](https://img.shields.io/github/stars/ManuJB023/inventory-dashboard) ![GitHub forks](https://img.shields.io/github/forks/ManuJB023/inventory-dashboard) ![GitHub issues](https://img.shields.io/github/issues/ManuJB023/inventory-dashboard)
+
+---
+
+*Last updated: August 9, 2025 | Version: 1.0.0*
