@@ -17,25 +17,25 @@
 <tr>
 <td width="50%">
 <h3>🏠 Landing Page</h3>
-<img src="https://via.placeholder.com/400x250/3B82F6/FFFFFF?text=Professional+Landing+Page" alt="Landing Page" width="100%">
+<img src=".github/images/landing-page.png" alt="Landing Page" width="100%">
 <p><em>Clean, professional welcome page with call-to-action</em></p>
 </td>
 <td width="50%">
 <h3>📊 Real-time Dashboard</h3>
-<img src="https://via.placeholder.com/400x250/10B981/FFFFFF?text=Live+Dashboard+Analytics" alt="Dashboard" width="100%">
+<img src=".github/images/dashboard.png" alt="Dashboard" width="100%">
 <p><em>Interactive dashboard with live statistics and metrics</em></p>
 </td>
 </tr>
 <tr>
 <td width="50%">
 <h3>📦 Product Management</h3>
-<img src="https://via.placeholder.com/400x250/8B5CF6/FFFFFF?text=Product+CRUD+Interface" alt="Product Management" width="100%">
+<img src=".github/images/products-page.png" alt="Product Management" width="100%">
 <p><em>Complete product management with modal forms</em></p>
 </td>
 <td width="50%">
-<h3>🏗️ AWS Architecture</h3>
-<img src="https://via.placeholder.com/400x250/F59E0B/FFFFFF?text=Cloud+Infrastructure" alt="Architecture" width="100%">
-<p><em>Production-ready AWS ECS deployment</em></p>
+<h3>➕ Add Product Modal</h3>
+<img src=".github/images/add-product-modal.png" alt="Add Product Modal" width="100%">
+<p><em>Professional form interface for adding products</em></p>
 </td>
 </tr>
 </table>
