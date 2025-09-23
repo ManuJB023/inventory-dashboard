@@ -166,11 +166,11 @@ htmlcov/
 # ==========================================
 
 # npm
-package-lock.json  # Comment this out if you want to commit lock files
+# package-lock.json  # Comment this out if you want to commit lock files
 .npmrc
 
 # Yarn
-yarn.lock  # Comment this out if you want to commit lock files
+# yarn.lock  # Comment this out if you want to commit lock files
 .yarnrc
 .yarn/
 .pnp.*
@@ -296,3 +296,136 @@ DRAFT-*.md
 # - terraform.tfvars.example
 # - docker-compose.override.yml.example
 # - aws-config.example.json
+
+# Terraform
+*.tfstate
+*.tfstate.backup
+.terraform/
+terraform.tfstate.lock.info
+
+# Environment variables
+*.tfvars
+*.tfvars.private
+terraform.tfvars.private
+
+# Backend configs
+backend-configs/
+
+# Sensitive files
+secrets.auto.tfvars
+
+# ESLint cache
+.eslintcache
+
+# Prettier cache
+.prettiercache
+
+# TypeScript cache
+*.tsbuildinfo
+
+# Next.js (if you ever migrate)
+.next/
+out/
+
+# Storybook build outputs
+storybook-static/
+
+# Yarn Berry (Yarn 2+)
+.yarn/cache
+.yarn/unplugged
+.yarn/install-state.gz
+
+# Rush
+common/temp/
+
+# Webpack
+.webpack/
+
+# Parcel cache
+.parcel-cache/
+
+# Vite cache
+node_modules/.vite/
+
+# Turbo
+.turbo/
+
+# Snyk
+.snyk
+
+# SonarQube
+.sonarqube/
+
+# Security scan results
+security-scan-results.json
+
+# Docker buildkit cache
+.docker/
+
+# GitHub Actions local testing
+.github/workflows/*.local.yml
+
+# CircleCI local
+.circleci/config.local.yml
+
+# CDK
+cdk.out/
+cdk.context.json
+
+# Serverless Framework
+.serverless/
+
+# Pulumi
+Pulumi.*.yaml
+.pulumi/
+
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# ==========================================
+# ADDITIONAL MODERN TOOLING
+# ==========================================
+
+# Build tool caches
+.eslintcache
+.prettiercache
+*.tsbuildinfo
+.webpack/
+.parcel-cache/
+node_modules/.vite/
+.turbo/
+
+# Modern package managers
+.yarn/cache
+.yarn/unplugged
+.yarn/install-state.gz
+.pnp.cjs
+
+# Security and analysis
+.snyk
+.sonarqube/
+security-scan-results.json
+
+# Additional cloud tools
+cdk.out/
+cdk.context.json
+.serverless/
+Pulumi.*.yaml
+.pulumi/
+.firebase/
+firebase-debug.log
+
+# Database tooling
+prisma/migrations/
+.env.prisma
+
+# CI/CD local testing
+.github/workflows/*.local.yml
+.circleci/config.local.yml
+
+# Performance profiling
+profile/
+*.cpuprofile
+*.heapprofile

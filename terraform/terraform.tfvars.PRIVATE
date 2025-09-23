@@ -1,19 +1,1 @@
-aws_region = "us-east-1"
-environment = "dev"
-project_name = "inventory-dashboard"
-
-# Database - Your strong password is already set!
 db_password = "Majoba077Strong!"
-db_instance_class = "db.t3.micro"
-db_allocated_storage = 20
-db_max_allocated_storage = 100
-
-# Container settings
-frontend_cpu = 256
-frontend_memory = 512
-backend_cpu = 512
-backend_memory = 1024
-
-# Scaling
-frontend_desired_count = 1  # Start with 1 for dev
-backend_desired_count = 1   # Start with 1 for dev

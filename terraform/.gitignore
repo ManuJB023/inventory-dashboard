@@ -1,0 +1,2 @@
+terraform.tfvars.private
+*.tfvars.private

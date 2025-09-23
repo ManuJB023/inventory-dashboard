@@ -1,33 +1,59 @@
 # terraform/ecs.tf
 
-# ECS Cluster
+# ECS Security Group
+resource "aws_security_group" "ecs" {
+  name        = "${local.name_prefix}-ecs-sg"
+  description = "Security group for ECS tasks"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    from_port       = 3000
+    to_port         = 3000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  ingress {
+    from_port       = 3001
+    to_port         = 3001
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb.id]
+  }
+
+  ingress {
+    from_port = 5432
+    to_port   = 5432
+    protocol  = "tcp"
+    self      = true
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = local.common_tags
+}
+
+# ECS Cluster (FIXED: Removed problematic configuration block)
 resource "aws_ecs_cluster" "main" {
   name = "${local.name_prefix}-cluster"
-  
-  configuration {
-    execute_command_configuration {
-      logging = "OVERRIDE"
-      
-      log_configuration {
-        cloud_watch_encryption_enabled = true
-        cloud_watch_log_group_name     = "/ecs/inventory-dashboard-dev-backend"
-      }
-    }
-  }
-  
+
   setting {
     name  = "containerInsights"
     value = var.environment == "prod" ? "enabled" : "disabled"
   }
-  
+
   tags = local.common_tags
 }
 
 resource "aws_ecs_cluster_capacity_providers" "main" {
   cluster_name = aws_ecs_cluster.main.name
-  
+
   capacity_providers = ["FARGATE", "FARGATE_SPOT"]
-  
+
   default_capacity_provider_strategy {
     base              = 1
     weight            = 100
@@ -38,7 +64,7 @@ resource "aws_ecs_cluster_capacity_providers" "main" {
 # IAM Role for ECS Task Execution
 resource "aws_iam_role" "ecs_task_execution" {
   name = "${local.name_prefix}-ecs-task-execution-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -51,7 +77,7 @@ resource "aws_iam_role" "ecs_task_execution" {
       }
     ]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -64,7 +90,7 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution" {
 resource "aws_iam_role_policy" "ecs_task_execution_ssm" {
   name = "${local.name_prefix}-ecs-task-execution-ssm"
   role = aws_iam_role.ecs_task_execution.id
-  
+
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -76,7 +102,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_ssm" {
           "ssm:GetParametersByPath"
         ]
         Resource = [
-          "arn:aws:ssm:${var.aws_region}:${data.aws_caller_identity.current.account_id}:parameter/${local.name_prefix}/*"
+          "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${local.name_prefix}/*"
         ]
       }
     ]
@@ -85,7 +111,7 @@ resource "aws_iam_role_policy" "ecs_task_execution_ssm" {
 
 resource "aws_iam_role" "ecs_task" {
   name = "${local.name_prefix}-ecs-task-role"
-  
+
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -98,7 +124,7 @@ resource "aws_iam_role" "ecs_task" {
       }
     ]
   })
-  
+
   tags = local.common_tags
 }
 
@@ -108,28 +134,96 @@ resource "aws_ssm_parameter" "db_user" {
   type      = "String"
   value     = var.db_username
   overwrite = true
-  
+
   tags = local.common_tags
+}
+
+# Load Balancer Target Groups and Listeners
+resource "aws_lb_target_group" "backend" {
+  name        = "${local.name_prefix}-backend"
+  port        = 3001
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+
+  health_check {
+    path                = "/health"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 30
+    matcher             = "200"
+  }
+
+  tags = local.common_tags
+}
+
+resource "aws_lb_target_group" "frontend" {
+  name        = "${local.name_prefix}-frontend"
+  port        = 3000
+  protocol    = "HTTP"
+  vpc_id      = aws_vpc.main.id
+  target_type = "ip"
+
+  health_check {
+    path                = "/"
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+    timeout             = 5
+    interval            = 30
+    matcher             = "200"
+  }
+
+  tags = local.common_tags
+}
+
+# Main listener
+resource "aws_lb_listener" "main" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "80"
+  protocol          = "HTTP"
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.frontend.arn
+  }
+}
+
+# Listener rule for backend API
+resource "aws_lb_listener_rule" "backend" {
+  listener_arn = aws_lb_listener.main.arn
+  priority     = 100
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/api/*"]
+    }
+  }
 }
 
 # Backend ECS Task Definition
 resource "aws_ecs_task_definition" "backend" {
   family                   = "${local.name_prefix}-backend"
-  network_mode            = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                     = var.backend_cpu
-  memory                  = var.backend_memory
-  execution_role_arn      = aws_iam_role.ecs_task_execution.arn
-  task_role_arn          = aws_iam_role.ecs_task.arn
-  
+  cpu                      = var.backend_cpu
+  memory                   = var.backend_memory
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
   container_definitions = jsonencode([
     {
       name  = "backend"
       image = "${aws_ecr_repository.backend.repository_url}:${var.backend_image_tag}"
-      
+
       essential = true
-      memory    = var.backend_memory  # FIXED: Added container-level memory
-      
+      memory    = var.backend_memory
+
       portMappings = [
         {
           containerPort = 3001
@@ -137,7 +231,7 @@ resource "aws_ecs_task_definition" "backend" {
           protocol      = "tcp"
         }
       ]
-      
+
       environment = [
         {
           name  = "NODE_ENV"
@@ -153,7 +247,7 @@ resource "aws_ecs_task_definition" "backend" {
         },
         {
           name  = "DB_PORT"
-          value = "5432"
+          value = tostring(aws_db_instance.main.port)
         },
         {
           name  = "DB_NAME"
@@ -168,7 +262,7 @@ resource "aws_ecs_task_definition" "backend" {
           value = "http://${aws_lb.main.dns_name}"
         }
       ]
-      
+
       secrets = [
         {
           name      = "DB_PASSWORD"
@@ -183,16 +277,16 @@ resource "aws_ecs_task_definition" "backend" {
           valueFrom = aws_ssm_parameter.jwt_secret.arn
         }
       ]
-      
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/inventory-dashboard-dev-backend"
-          "awslogs-region"        = var.aws_region
+          "awslogs-group"         = aws_cloudwatch_log_group.backend.name
+          "awslogs-region"        = data.aws_region.current.name
           "awslogs-stream-prefix" = "ecs"
         }
       }
-      
+
       healthCheck = {
         command = [
           "CMD-SHELL",
@@ -205,30 +299,30 @@ resource "aws_ecs_task_definition" "backend" {
       }
     }
   ])
-  
+
   tags = local.common_tags
 }
 
 # Migration Task Definition
 resource "aws_ecs_task_definition" "migration" {
   family                   = "${local.name_prefix}-migration"
-  network_mode            = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                     = 256
-  memory                  = 512
-  execution_role_arn      = aws_iam_role.ecs_task_execution.arn
-  task_role_arn          = aws_iam_role.ecs_task.arn
-  
+  cpu                      = 256
+  memory                   = 512
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
   container_definitions = jsonencode([
     {
       name  = "migration"
       image = "${aws_ecr_repository.backend.repository_url}:${var.backend_image_tag}"
-      
+
       essential = true
-      memory    = 512  # FIXED: Added container-level memory
-      
+      memory    = 512
+
       command = ["npm", "run", "db:migrate"]
-      
+
       environment = [
         {
           name  = "NODE_ENV"
@@ -240,7 +334,7 @@ resource "aws_ecs_task_definition" "migration" {
         },
         {
           name  = "DB_PORT"
-          value = "5432"
+          value = tostring(aws_db_instance.main.port)
         },
         {
           name  = "DB_NAME"
@@ -251,7 +345,7 @@ resource "aws_ecs_task_definition" "migration" {
           value = "true"
         }
       ]
-      
+
       secrets = [
         {
           name      = "DB_PASSWORD"
@@ -262,39 +356,39 @@ resource "aws_ecs_task_definition" "migration" {
           valueFrom = aws_ssm_parameter.db_user.arn
         }
       ]
-      
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/inventory-dashboard-dev-backend"
-          "awslogs-region"        = var.aws_region
+          "awslogs-group"         = aws_cloudwatch_log_group.backend.name
+          "awslogs-region"        = data.aws_region.current.name
           "awslogs-stream-prefix" = "migration"
         }
       }
     }
   ])
-  
+
   tags = local.common_tags
 }
 
 # Frontend ECS Task Definition
 resource "aws_ecs_task_definition" "frontend" {
   family                   = "${local.name_prefix}-frontend"
-  network_mode            = "awsvpc"
+  network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                     = var.frontend_cpu
-  memory                  = var.frontend_memory
-  execution_role_arn      = aws_iam_role.ecs_task_execution.arn
-  task_role_arn          = aws_iam_role.ecs_task.arn
-  
+  cpu                      = var.frontend_cpu
+  memory                   = var.frontend_memory
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
   container_definitions = jsonencode([
     {
       name  = "frontend"
       image = "${aws_ecr_repository.frontend.repository_url}:${var.frontend_image_tag}"
-      
+
       essential = true
-      memory    = var.frontend_memory  # FIXED: Added container-level memory
-      
+      memory    = var.frontend_memory
+
       portMappings = [
         {
           containerPort = 3000
@@ -302,7 +396,7 @@ resource "aws_ecs_task_definition" "frontend" {
           protocol      = "tcp"
         }
       ]
-      
+
       environment = [
         {
           name  = "NODE_ENV"
@@ -313,16 +407,16 @@ resource "aws_ecs_task_definition" "frontend" {
           value = "http://${aws_lb.main.dns_name}/api"
         }
       ]
-      
+
       logConfiguration = {
         logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/inventory-dashboard-dev-frontend"
-          "awslogs-region"        = var.aws_region
+          "awslogs-group"         = aws_cloudwatch_log_group.frontend.name
+          "awslogs-region"        = data.aws_region.current.name
           "awslogs-stream-prefix" = "ecs"
         }
       }
-      
+
       healthCheck = {
         command = [
           "CMD-SHELL",
@@ -335,7 +429,7 @@ resource "aws_ecs_task_definition" "frontend" {
       }
     }
   ])
-  
+
   tags = local.common_tags
 }
 
@@ -346,41 +440,41 @@ resource "aws_ecs_service" "backend" {
   task_definition = aws_ecs_task_definition.backend.arn
   desired_count   = var.backend_desired_count
   launch_type     = "FARGATE"
-  
+
   platform_version = "1.4.0"
-  
+
   # Health check grace period for load balancer
   health_check_grace_period_seconds = 120
-  
+
   network_configuration {
     subnets          = aws_subnet.private[*].id
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = false
   }
-  
+
   load_balancer {
     target_group_arn = aws_lb_target_group.backend.arn
     container_name   = "backend"
     container_port   = 3001
   }
-  
+
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-  
+
   deployment_circuit_breaker {
     enable   = true
     rollback = true
   }
-  
+
   service_registries {
     registry_arn = aws_service_discovery_service.backend.arn
   }
-  
+
   depends_on = [
     aws_lb_listener.main,
     aws_iam_role_policy_attachment.ecs_task_execution
   ]
-  
+
   tags = local.common_tags
 }
 
@@ -391,34 +485,34 @@ resource "aws_ecs_service" "frontend" {
   task_definition = aws_ecs_task_definition.frontend.arn
   desired_count   = var.frontend_desired_count
   launch_type     = "FARGATE"
-  
+
   platform_version = "1.4.0"
-  
+
   network_configuration {
     subnets          = aws_subnet.private[*].id
     security_groups  = [aws_security_group.ecs.id]
     assign_public_ip = false
   }
-  
+
   load_balancer {
     target_group_arn = aws_lb_target_group.frontend.arn
     container_name   = "frontend"
     container_port   = 3000
   }
-  
+
   deployment_maximum_percent         = 200
   deployment_minimum_healthy_percent = 100
-  
+
   deployment_circuit_breaker {
     enable   = true
     rollback = true
   }
-  
+
   depends_on = [
     aws_lb_listener.main,
     aws_iam_role_policy_attachment.ecs_task_execution
   ]
-  
+
   tags = local.common_tags
 }
 
@@ -427,24 +521,24 @@ resource "aws_service_discovery_private_dns_namespace" "main" {
   name        = "${local.name_prefix}.local"
   description = "Private DNS namespace for ${local.name_prefix}"
   vpc         = aws_vpc.main.id
-  
+
   tags = local.common_tags
 }
 
 resource "aws_service_discovery_service" "backend" {
   name = "backend"
-  
+
   dns_config {
     namespace_id = aws_service_discovery_private_dns_namespace.main.id
-    
+
     dns_records {
       ttl  = 10
       type = "A"
     }
-    
+
     routing_policy = "MULTIVALUE"
   }
-  
+
   tags = local.common_tags
 }
 
@@ -455,7 +549,7 @@ resource "aws_appautoscaling_target" "backend" {
   resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.backend.name}"
   scalable_dimension = "ecs:service:DesiredCount"
   service_namespace  = "ecs"
-  
+
   tags = local.common_tags
 }
 
@@ -465,12 +559,12 @@ resource "aws_appautoscaling_policy" "backend_cpu" {
   resource_id        = aws_appautoscaling_target.backend.resource_id
   scalable_dimension = aws_appautoscaling_target.backend.scalable_dimension
   service_namespace  = aws_appautoscaling_target.backend.service_namespace
-  
+
   target_tracking_scaling_policy_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ECSServiceAverageCPUUtilization"
     }
-    
+
     target_value = 70.0
   }
 }
