@@ -690,7 +690,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **⭐ Star this repository if you find it helpful!**
 
-**🔗 Connect**: [GitHub](https://github.com/ManuJB023) | [Portfolio](https://your-portfolio-link.com)
+**🔗 Connect**: [GitHub](https://github.com/ManuJB023) | [Portfolio](https://manuelbauka.dev/)
 
 ---
 
