@@ -169,6 +169,145 @@ Access the products section to:
 - **Supplier Tracking**: Manage supplier relationships
 - **Category Organization**: Group products logically
 
+## 🌐 CORS Configuration for Production Deployment
+
+### **Understanding the CORS Issue**
+When deploying to AWS, you may encounter CORS errors when the frontend tries to communicate with the backend. This happens because:
+- **Local Development**: Frontend (localhost:3000) → Backend (localhost:3001) ✅ Same origin policy handled
+- **AWS Production**: Frontend (your-lb-url.com) → Backend (your-lb-url.com/api) ❌ May trigger CORS preflight requests
+
+### **Common CORS Symptoms**
+- **Add Product**: Works fine (POST requests often don't trigger preflight)
+- **Edit/Delete Products**: Fails with network errors (PUT/DELETE trigger CORS preflight)
+- **Browser Console**: Shows CORS policy errors
+
+### **Solution: Backend CORS Configuration**
+
+#### **Option 1: Environment-Based CORS (Recommended)**
+Update your backend's CORS configuration to dynamically allow origins:
+
+```javascript
+// backend/app.js
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',                    // Local development
+    process.env.CORS_ORIGIN,                   // Environment-specific origin
+    process.env.FRONTEND_URL                   // AWS load balancer URL
+  ].filter(Boolean),                           // Remove undefined values
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+
+app.use(cors(corsOptions));
+```
+
+#### **Option 2: Terraform Environment Variables**
+Update your ECS task definition in `terraform/ecs.tf`:
+
+```hcl
+# In the backend container definition
+environment = [
+  {
+    name  = "CORS_ORIGIN"
+    value = "http://${aws_lb.main.dns_name}"
+  },
+  {
+    name  = "FRONTEND_URL"
+    value = "http://${aws_lb.main.dns_name}"
+  },
+  # ... other environment variables
+]
+```
+
+#### **Option 3: Multiple Origins Support**
+For development and production environments:
+
+```javascript
+// backend/middleware/cors.js
+const getAllowedOrigins = () => {
+  const origins = [
+    'http://localhost:3000',
+    'http://localhost:3001'
+  ];
+  
+  if (process.env.CORS_ORIGIN) {
+    origins.push(process.env.CORS_ORIGIN);
+  }
+  
+  if (process.env.FRONTEND_URL) {
+    origins.push(process.env.FRONTEND_URL);
+  }
+  
+  return origins;
+};
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    const allowedOrigins = getAllowedOrigins();
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
+};
+```
+
+### **Testing CORS Configuration**
+
+#### **Method 1: Browser Network Tab**
+1. Open Developer Tools (F12)
+2. Go to Network tab
+3. Try edit/delete operations
+4. Look for successful OPTIONS preflight requests
+
+#### **Method 2: cURL Testing**
+```bash
+# Test preflight request
+curl -X OPTIONS \
+  -H "Origin: http://your-frontend-url.com" \
+  -H "Access-Control-Request-Method: PUT" \
+  -H "Access-Control-Request-Headers: Content-Type" \
+  http://your-backend-url.com/api/products/some-id
+
+# Should return CORS headers in response
+```
+
+#### **Method 3: Local Development Workaround**
+If you need immediate testing without redeploying:
+
+```bash
+# Use local React app with AWS backend
+cd frontend
+echo "REACT_APP_API_URL=http://your-aws-lb-url.com/api" > .env
+npm start
+
+# Access at http://localhost:3000 (matches backend CORS)
+```
+
+### **Production Deployment with CORS Fix**
+```bash
+# After updating CORS configuration
+cd terraform
+terraform apply  # Updates ECS task definitions
+
+# Force service update to pick up new configuration
+aws ecs update-service \
+  --cluster inventory-dashboard-dev-cluster \
+  --service inventory-dashboard-dev-backend \
+  --force-new-deployment
+```
+
+### **CORS Headers to Expect**
+A properly configured backend should return these headers:
+```
+Access-Control-Allow-Origin: http://your-frontend-url.com
+Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+Access-Control-Allow-Headers: Content-Type, Authorization
+Access-Control-Allow-Credentials: true
+```
+
 ## 🚀 Deploy to AWS (Fully Tested Production Deployment)
 
 This project includes **complete, tested AWS infrastructure templates** for production deployment.
@@ -208,7 +347,7 @@ terraform output application_url
 
 The infrastructure has been thoroughly tested and works perfectly, but ongoing costs make it impractical to maintain a permanent demo.
 
-## 🏗 Project Structure
+## 🗂 Project Structure
 
 ```
 inventory-dashboard/
@@ -255,8 +394,9 @@ NODE_ENV=development
 PORT=3001
 JWT_SECRET=your_jwt_secret_minimum_32_characters
 
-# Security
+# Security & CORS
 CORS_ORIGIN=http://localhost:3000
+FRONTEND_URL=http://localhost:3000  # Add for AWS deployment
 LOG_LEVEL=info
 ```
 
@@ -358,7 +498,7 @@ SELECT * FROM "StockMovements"; # View stock movements
 - **Input Validation** - Express-validator on all endpoints
 - **SQL Injection Prevention** - Sequelize ORM with parameterized queries
 - **XSS Protection** - Helmet.js security headers
-- **CORS Configuration** - Controlled cross-origin requests
+- **CORS Configuration** - Controlled cross-origin requests with environment-specific origins
 - **Rate Limiting** - Protection against API abuse (100 req/15min)
 - **Request Logging** - Complete audit trail with Morgan
 
@@ -486,6 +626,7 @@ aws ecr delete-repository --repository-name inventory-dashboard-dev-frontend --f
 - [x] **NAT Gateway networking solution**
 - [x] **ECS Fargate container orchestration**
 - [x] **RDS PostgreSQL database integration**
+- [x] **CORS configuration for production deployment**
 
 ### **Phase 2 - Enhanced Features**
 - [ ] User authentication and authorization
@@ -620,6 +761,17 @@ aws elbv2 describe-target-health --target-group-arn <TARGET_GROUP_ARN>
 # ✅ SOLVED: Load balancer health checks configured and working
 ```
 
+#### **"CORS Errors - Edit/Delete Not Working"**
+```bash
+# Check browser console for CORS errors (F12 → Console)
+# Look for messages like "blocked by CORS policy"
+
+# Test backend CORS headers
+curl -H "Origin: http://your-frontend-url" -H "Access-Control-Request-Method: PUT" -X OPTIONS http://your-backend-url/api/products/123
+
+# ✅ SOLVED: See CORS Configuration section above
+```
+
 ## 📚 Learning Resources
 
 ### **Technologies Used**
@@ -633,6 +785,7 @@ aws elbv2 describe-target-health --target-group-arn <TARGET_GROUP_ARN>
 - **[Docker Documentation](https://docs.docker.com/)** - Containerization
 - **[AWS ECS Guide](https://docs.aws.amazon.com/ecs/)** - Container orchestration
 - **[Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/)** - Infrastructure as code
+- **[CORS MDN Guide](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS)** - Cross-Origin Resource Sharing
 
 ### **Related Projects & Inspiration**
 - **[Awesome React](https://github.com/enaqx/awesome-react)** - React ecosystem
@@ -652,7 +805,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Database**: PostgreSQL 16 with advanced features
 - **Infrastructure**: AWS ECS Fargate, Terraform ✅ **TESTED IN PRODUCTION**
 - **DevOps**: Docker, Multi-stage builds, Health checks
-- **Security**: Input validation, CORS, rate limiting, encryption
+- **Security**: Input validation, CORS with environment configuration, rate limiting, encryption
 - **Networking**: VPC, NAT Gateways, Security Groups ✅ **VERIFIED WORKING**
 
 **Production Testing Completed:**
@@ -663,13 +816,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Security group configurations
 - NAT Gateway internet access for private subnets
 - CloudWatch logging and monitoring
+- CORS configuration for production deployment
 
 ## 📞 Support & Community
 
 - **🐛 Issues**: [GitHub Issues](https://github.com/ManuJB023/inventory-dashboard/issues)
 - **💬 Discussions**: [GitHub Discussions](https://github.com/ManuJB023/inventory-dashboard/discussions)
 - **📖 Documentation**: This README and inline code comments
-- **🔍 Examples**: Check the codebase for implementation patterns
+- **📝 Examples**: Check the codebase for implementation patterns
 
 ## 📊 Project Status
 
@@ -684,6 +838,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - ✅ Docker containers optimized and working
 - ✅ Database migrations and connectivity confirmed
 - ✅ Load balancing and health checks operational
+- ✅ CORS configuration documented and tested
 - ⚠️ Live demo temporarily offline due to hosting costs
 
 ---
@@ -695,4 +850,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 *Built with ❤️ using modern full-stack technologies and tested on AWS infrastructure*  
-*Last updated: September 23, 2025 | Version: 1.1.0 - AWS Production Verified*
+*Last updated: September 25, 2025 | Version: 1.2.0 - AWS Production Verified with CORS Documentation*

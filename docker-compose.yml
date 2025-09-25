@@ -1,13 +1,14 @@
 # docker-compose.yml
+
 services:
+  # PostgreSQL Database
   postgres:
     image: postgres:15
     container_name: inventory_postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres123
+      POSTGRES_PASSWORD: Majoba077Strong
       POSTGRES_DB: inventory_db
-      # Force password authentication for all connections
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
       POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256 --auth-local=scram-sha-256"
     ports:
@@ -15,10 +16,61 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "PGPASSWORD=Majoba077Strong! pg_isready -U postgres -d inventory_db"]
+      test: ["CMD-SHELL", "PGPASSWORD=Majoba077Strong pg_isready -U postgres -d inventory_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
+
+  # Backend API Service
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: inventory_backend
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: inventory_db
+      DB_USER: postgres
+      DB_PASSWORD: Majoba077Strong
+      JWT_SECRET: your_jwt_secret_minimum_32_characters_here
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "3001:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # Frontend React Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: inventory_frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:3001/api
+      REACT_APP_ENV: development
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
     restart: unless-stopped
 
   # Optional: pgAdmin for database management
